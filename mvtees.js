@@ -88,4 +88,18 @@ class MVTees {
 		this.set_local_storage( this.tests[1].name, this.tests[1] )
 	}
 
+	/**
+	 * Generate a valid uuid for users.
+	 *
+	 * inpiration for this entire function was found at the link
+	 * @link https://gist.github.com/jed/982883
+	 *
+	 * @return {string} a valid uuidv4
+	 */
+	static generate_uuidv4() {
+		return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+		)
+	}
+
 }
