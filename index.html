@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>Title Goes Here</title>
+	<script src="mvtees.js"></script>
+</head>
+<body>
+	<p>This is my web page</p>
+	<script>
+
+		document.addEventListener("DOMContentLoaded", function() {
+			var mvtname = 'MVTees';
+			var mvtdebug = true;
+
+			let p = new MVTees(mvtname, mvtdebug);
+
+			// Run some stuff and test some stuff here.
+
+			console.log('The name is: ');
+			console.log( p.name );
+
+			let tests = p.get_tests();
+
+			console.log('The tests are: ');
+			console.log( tests );
+			console.log( p.get_tests() );
+			console.log( p.get_tests(0) );
+			console.log( tests[0] );
+
+			console.log( p.get_tests(1) );
+			console.log( tests[1] );
+			var d = new Date();
+			var n = d.getMinutes();
+
+			p.set_local_storage( n, d );
+			console.log( p.get_local_storage( n ) );
+			p.do_test({
+				name: 'testext',
+				data: 'external'
+			});
+			console.log( p.get_local_storage( 'testext' ) );
+		});
+
+	</script>
+</body>
+</html>
