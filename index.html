@@ -10,38 +10,41 @@
 	<script>
 
 		document.addEventListener("DOMContentLoaded", function() {
-			var mvtname = 'MVTees';
+			var mvtname = 'mvtees_test';
 			var mvtdebug = true;
 
 			let p = new MVTees(mvtname, mvtdebug);
 
-			// Run some stuff and test some stuff here.
-
-			console.log('The name is: ');
-			console.log( p.name );
-
-			let tests = p.get_tests();
-
-			console.log('The tests are: ');
-			console.log( tests );
-			console.log( p.get_tests() );
-			console.log( p.get_tests(0) );
-			console.log( tests[0] );
-
-			console.log( p.get_tests(1) );
-			console.log( tests[1] );
-			var d = new Date();
-			var n = d.getMinutes();
-
-			p.set_local_storage( n, d );
-			console.log( p.get_local_storage( n ) );
 			p.do_test({
 				name: 'testext',
-				data: 'external'
+				data: 'external',
+				varients: {
+					external_1: {
+						onChosen: function() {
+							console.log( 'external_1 was chosen' );
+						}
+					},
+					external_2: {
+						onChosen: function() {
+							console.log( 'external_2 was chosen' );
+						}
+					}
+				}
 			});
-			console.log( p.get_local_storage( 'testext' ) );
+			p.do_test({
+				name: 'testext2',
+				data: 'external',
+				varients: {
+					external2_1: {
+						onChosen: function() {
+							console.log( 'external2_1 was chosen' );
+						}
+					},
+				}
+			});
+			// console.log( p.get_local_storage( 'testext' ) );
 
-			console.log( 'uuid: ' + MVTees.generate_uuidv4() );
+			// console.log( 'uuid: ' + MVTees.generate_uuidv4() );
 		});
 
 	</script>
