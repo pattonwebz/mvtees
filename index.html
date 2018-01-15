@@ -6,45 +6,110 @@
 	<script src="mvtees.js"></script>
 </head>
 <body>
-	<p>This is my web page</p>
+	<p id="opener">This is my web page.</p>
+	<p id="main">It's used to build a split test system for testing various pieces of <span id="testelement">content</span></p>
+	<!-- This is the test script and should likely be externalised -->
 	<script>
 
-		document.addEventListener("DOMContentLoaded", function() {
-			var mvtname = 'mvtees_test';
-			var mvtdebug = true;
+		var mvtname = 'mvtees_test';
+		var mvtdebug = false;
 
-			let p = new MVTees(mvtname, mvtdebug);
+		let p = new MVTees(mvtname, mvtdebug);
 
-			p.do_test({
-				name: 'testext',
-				data: 'external',
-				varients: {
-					external_1: {
-						onChosen: function() {
-							console.log( 'external_1 was chosen' );
-						}
+		// add a test with 3 variants that changes some text in the page.
+		p.add_test({
+			name: 'test1',
+			data: 'first',
+			varients: {
+				test1_1: {
+					onChosen: function() {
+						console.log( 'test1_1 was chosen' );
+						let el = document.getElementById('testelement');
+						el.innerHTML = 'text';
 					},
-					external_2: {
-						onChosen: function() {
-							console.log( 'external_2 was chosen' );
-						}
+				},
+				test1_2: {
+					onChosen: function() {
+						console.log( 'test1_2 was chosen' );
+						let el = document.getElementById('testelement');
+						el.innerHTML = 'code';
+					}
+				},
+				test1_3: {
+					onChosen: function() {
+						console.log( 'test1_3 was chosen' );
+						let el = document.getElementById('testelement');
+						el.innerHTML = 'third';
+						el.style.color = 'red';
 					}
 				}
-			});
-			p.do_test({
-				name: 'testext2',
-				data: 'external',
-				varients: {
-					external2_1: {
-						onChosen: function() {
-							console.log( 'external2_1 was chosen' );
-						}
-					},
-				}
-			});
-			// console.log( p.get_local_storage( 'testext' ) );
+			}
+		});
 
-			// console.log( 'uuid: ' + MVTees.generate_uuidv4() );
+		p.add_test({
+			name: 'test2',
+			data: 'second',
+			varients: {
+				test2_1: {
+					onChosen: function() {
+						console.log( 'test2_1 was chosen' );
+					}
+				},
+				test2_2: {
+					onChosen: function() {
+						console.log( 'test2_2 was chosen' );
+						document.getElementById('opener').style.color = "#666";
+					}
+				}
+			}
+		});
+
+		p.add_test({
+			name: 'test3',
+			varients: {
+				var1: {
+					test_type: 'basic',
+					onChosen: function() {
+						console.log( 'var1 was chosen' );
+						document.getElementById('main').style.fontWeight = "600";
+					}
+				},
+				var2: {
+					onChosen: function() {
+						console.log( 'var2 was chosen' );
+					}
+				}
+			}
+		});
+
+		p.run_tests();
+
+		p.do_test({
+			name: 'testext',
+			data: 'external',
+			varients: {
+				external_1: {
+					onChosen: function() {
+						console.log( 'external_1 was chosen' );
+					}
+				},
+				external_2: {
+					onChosen: function() {
+						console.log( 'external_2 was chosen' );
+					}
+				}
+			}
+		});
+		p.do_test({
+			name: 'testext2',
+			data: 'external',
+			varients: {
+				external2_1: {
+					onChosen: function() {
+						console.log( 'external2_1 was chosen' );
+					}
+				},
+			}
 		});
 
 	</script>

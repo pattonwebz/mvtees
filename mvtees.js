@@ -13,20 +13,16 @@ class MVTees {
 
 	// constructor to do instasiate tasks (this).
 	constructor( name, debug ) {
-		// set.
+
+		// Set some base properties of the class.
+		// A name, a tests array and debug flag.
 		this.name = name || 'mvtees';
 		this.tests = [];
 		// debug toggle.
 		this.debug = debug || false;
 
-		// determine if this user is in a test already.
+		// Determine if this user is already got an ID.
 		this.user = this.get_user_id();
-
-		// this is only present in dev.
-		this.dev_mock_tests();
-
-		// run the tests.
-		this.run_tests();
 
 	}
 
@@ -105,11 +101,23 @@ class MVTees {
 		return result;
 	}
 
+	/**
+	 * Helper function to set some values to local storage.
+	 *
+	 * @param {string} key the key we'll save to local storage with.
+	 * @param {mixed}  obj the data we're putting into local storage.
+	 */
 	set_local_storage( key, obj ) {
 		var storage = window.localStorage;
 		storage.setItem( this.name + '-' + key, JSON.stringify( obj, null, 4 ) );
 	}
 
+	/**
+	 * Helper function to get values from local storage.
+	 *
+	 * @param {string} key the key we want to get data for.
+	 * @return {mixed}     maybe return the data from local storage.
+	 */
 	get_local_storage( key ) {
 		var storage = window.localStorage;
 		if ( storage ) {
@@ -123,23 +131,40 @@ class MVTees {
 		}
 	}
 
+	/**
+	 * Convenience method to perform tests at creation.
+	 *
+	 * @param {object} test should be a test object.
+	 */
 	do_test( test ){
 		this._run_test( test );
 	}
 
+	/**
+	 * Adds a test object to the tests array of the class.
+	 *
+	 * @param {object} test a test object to maybe add.
+	 * @return {mixed}       returns false on failuire null on success.
+	 */
 	add_test( test ){
+		if ( this.debug ) {
+			console.log( test );
+		}
 		// test that we have the required values.
-		if ( test.name !== null ) {
+		if ( test.name === null ) {
 			console.log( 'No name was passed when adding a test.' );
-			return;
+			return false;
 		}
 		if ( test.data === null ) {
 			console.log( 'No test data was passed when adding a test.' );
-			return;
+			return false;
 		}
 		this.tests.push( test )
 	}
 
+	/**
+	 * Loops through all the tests array and triggers each test to run.
+	 */
 	run_tests(){
 		let length = this.tests.length;
 		for ( let i = 0; i < length; i++ ) {
@@ -151,6 +176,13 @@ class MVTees {
 		}
 	}
 
+	/**
+	 * This is the actual test runner function. It runs the vorrect varient for
+	 * the given user based on previous selection - or it does the selection.
+	 *
+	 * @param {object} test a test object to run.
+	 * @return {[type]}
+	 */
 	_run_test( test ) {
 		// make sure we got a test passed.
 		if ( test ) {
@@ -181,6 +213,10 @@ class MVTees {
 			}
 		}
 	}
+
+	/**
+	 * This function is just to mock adding of tests and is used in dev only.
+	 */
 	dev_mock_tests() {
 		this.tests.push({
 			name: 'test1',
