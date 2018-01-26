@@ -16,7 +16,7 @@
 
 		let p = new MVTees(mvtname, mvtdebug);
 
-		// add a test with 3 variants that changes some text in the page.
+		// add a test with 3 varients that changes some text in the page.
 		p.add_test({
 			name: 'test1',
 			data: 'first',
@@ -27,6 +27,7 @@
 						let el = document.getElementById('testelement');
 						el.innerHTML = 'text';
 					},
+					item: 'item',
 				},
 				test1_2: {
 					onChosen: function() {

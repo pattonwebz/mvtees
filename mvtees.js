@@ -6,6 +6,125 @@
 
 'use strict';
 
+class MVTees_StorageAdapter {
+
+	constructor( namespace, test ) {
+		this.namespace = namespace || 'mvtees';
+	}
+
+	trackEvent( category, action, opt_label, opt_value ) {
+		console.log( 'GA trackEvent: ' + category + ', ' + action + ', ' + opt_label + ', ' + opt_value );
+
+		if ( window['ga'] ) {
+			ga( 'send', 'event', category, action, opt_label, opt_value );
+		} else {
+			throw('The ga object not found: It looks like you haven\'t correctly setup the asynchronous Google Analytics tracking code, and you are using the default GoogleAnalyticsAdapter.');
+		}
+
+	}
+	onInitialize( inTest, testName, cohort ) {
+		if ( inTest ) {
+			this.trackEvent( this.nameSpace, testName, cohort + ' | Total' );
+		}
+	}
+	onEvent( testName, cohort, eventName ) {
+		this.trackEvent( this.nameSpace, testName, cohort + ' | ' + eventName );
+	}
+
+}
+
+/**
+ * Class for holding and running tests.
+ */
+class MVTees_Test {
+
+	constructor( test, options = { 'return': true } ) {
+		/**
+		 * If we do not have the required items then we should return a fail.
+		 *
+		 * Test we have at least a name and varients.
+		 */
+		this.test = {};
+		if ( test.name === null ) {
+			console.log( 'No name was passed when adding a test.' );
+			return false;
+		}
+		// we have a name for the test.
+		this.test.name = test.name;
+		if ( test.varients === null ) {
+			console.log( 'No varients were passed when adding a test.' );
+			return false;
+		}
+		// test the varients are valid.
+		let varients = this._test_varients_valid( test.varients );
+		this.test.varients = varients;
+		/**
+		 * Merge the optional values with the rest of the values from the test
+		 * object.
+		 */
+		this.test = Object.assign( this._get_test_defaults(), this.test );
+
+		/**
+		 * We probably want to return the MVTees_Test object.
+		 */
+		if ( options.return ) {
+			return this.test;
+		}
+
+	}
+
+	/**
+	 * Helper to return an object containing the default values of tests. This
+	 * is intended to be a private method.
+	 *
+	 * @return {object} Object with default values for the MVTees_Test object.
+	 */
+	_get_test_defaults() {
+		let defaults = {
+			name: null,
+			sample: 1,
+			storageAdapter: null,
+			varients: null,
+		}
+		return defaults;
+	}
+
+	/**
+	 * Tests if we seem to have valid varients.
+	 *
+	 * @param {array} varients an array of varient objects.
+	 *
+	 * @return {mixed} an array of validated varients or false on faliure.
+	 */
+	_test_varients_valid( varients ) {
+		console.log( varients );
+
+		// loop through each varient and test if it's got a chosen method and a
+		// conversion method.
+		for ( let v in varients ) {
+			if ( varients[v] ) {
+				if ( typeof varients[v].onChosen === 'function' ) {
+					console.log( 'onChosen seems a function' );
+				}
+				if ( typeof varients[v].onEvent === 'function' ) {
+					console.log( 'onEvent seems a function' );
+				}
+			}
+		}
+		return varients;
+	}
+	_get_varient_defaults() {
+		let defaults = {
+			onChosen: function() {},
+			onInitialize: function() {},
+		}
+		return defaults;
+	}
+	_test_varient() {
+
+	}
+}
+
 /**
  * ES6 class to hold the test library.
  */
@@ -18,6 +137,7 @@ class MVTees {
 		// A name, a tests array and debug flag.
 		this.name = name || 'mvtees';
 		this.tests = [];
+		this.tests_run = [];
 		// debug toggle.
 		this.debug = debug || false;
 
@@ -36,7 +156,7 @@ class MVTees {
 		if ( ! id ) {
 			id = MVTees.generate_uuidv4();
 			console.log( id );
-			this.set_local_storage( 'uuid', id.toString() );
+			this.set_local_storage( 'uuid', id );
 		}
 		return id;
 	}
@@ -150,16 +270,8 @@ class MVTees {
 		if ( this.debug ) {
 			console.log( test );
 		}
-		// test that we have the required values.
-		if ( test.name === null ) {
-			console.log( 'No name was passed when adding a test.' );
-			return false;
-		}
-		if ( test.data === null ) {
-			console.log( 'No test data was passed when adding a test.' );
-			return false;
-		}
-		this.tests.push( test )
+		let test_obj = new MVTees_Test( test );
+		this.tests.push( test_obj )
 	}
 
 	/**
@@ -209,6 +321,10 @@ class MVTees {
 					console.log( keyname );
 					console.log( test.varients[ keyname ] );
 				}
+				this.tests_run.push({
+					name: test.name,
+					key: keyname,
+				});
 				test.varients[keyname].onChosen();
 			}
 		}
